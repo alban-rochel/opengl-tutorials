@@ -8,5 +8,6 @@ pkg_check_modules(GLFW REQUIRED glfw3)
 
 set(CMAKE_CXX_STANDARD 11)
 
+add_subdirectory(common)
 add_subdirectory(01_fenetre)
 add_subdirectory(02_triangle)
