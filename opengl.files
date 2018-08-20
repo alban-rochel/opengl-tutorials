@@ -1,6 +1,10 @@
 02_triangle/SimpleFragmentShader.fragmentshader
 02_triangle/SimpleVertexShader.vertexshader
 02_triangle/simplevertexshader.vertexshader
+03_matrices/03_main.cpp
+03_matrices/CMakeLists.txt
+03_matrices/SimpleFragmentShader.fragmentshader
+03_matrices/SimpleVertexShader.vertexshader
 common/CMakeLists.txt
 common/loadshaders.cpp
 common/loadshaders.h
