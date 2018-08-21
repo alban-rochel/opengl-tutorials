@@ -5,6 +5,10 @@
 03_matrices/CMakeLists.txt
 03_matrices/SimpleFragmentShader.fragmentshader
 03_matrices/SimpleVertexShader.vertexshader
+04_cube/04_main.cpp
+04_cube/CMakeLists.txt
+04_cube/SimpleFragmentShader.fragmentshader
+04_cube/SimpleVertexShader.vertexshader
 common/CMakeLists.txt
 common/loadshaders.cpp
 common/loadshaders.h
