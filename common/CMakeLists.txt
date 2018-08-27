@@ -4,6 +4,7 @@ set(COMMON_SRC
     loadshaders.cpp
     texture.cpp
     controls.cpp
+    objloader.cpp
     )
 
 add_library(${COMMON} SHARED ${COMMON_SRC})
