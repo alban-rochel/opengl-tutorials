@@ -1,3 +1,7 @@
+common/coincoin.h
+common/controls.cpp
+common/controls.h
+common/texture.h
 01_fenetre/01_main.cpp
 01_fenetre/CMakeLists.txt
 02_triangle/02_main.cpp
@@ -17,6 +21,11 @@
 05_texture/SimpleFragmentShader.fragmentshader
 05_texture/SimpleVertexShader.vertexshader
 05_texture/uvtemplate.DDS
+06_keyboard/06_main.cpp
+06_keyboard/CMakeLists.txt
+06_keyboard/SimpleFragmentShader.fragmentshader
+06_keyboard/SimpleVertexShader.vertexshader
+06_keyboard/uvtemplate.DDS
 CMakeLists.txt
 common/CMakeLists.txt
 common/loadshaders.cpp
