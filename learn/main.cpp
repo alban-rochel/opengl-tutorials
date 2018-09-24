@@ -139,6 +139,9 @@ int main(int, char**)
 
     glClear(GL_COLOR_BUFFER_BIT);
 
+    int vertexColorLocation = glGetUniformLocation(shaders.program(), "time");
+    glUniform1f(vertexColorLocation, glfwGetTime());
+
     shaders.use();
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES,

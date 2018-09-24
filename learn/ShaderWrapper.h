@@ -16,6 +16,8 @@ class ShaderWrapper
 
     bool use() noexcept;
 
+    GLuint program() noexcept;
+
   private:
     class Private;
     std::unique_ptr<Private>_private;

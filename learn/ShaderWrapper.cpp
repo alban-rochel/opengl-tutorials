@@ -169,3 +169,11 @@ bool ShaderWrapper::use() noexcept
 
   return true;
 }
+
+GLuint ShaderWrapper::program() noexcept
+{
+  assert(_private);
+  assert(_private->_program);
+
+  return _private->_program;
+}
