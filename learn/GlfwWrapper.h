@@ -1,6 +1,7 @@
 #pragma once
 
 #include "learn_common.h"
+#include <memory>
 
 class GlfwWrapper
 {
@@ -12,25 +13,14 @@ class GlfwWrapper
 
     bool init() noexcept;
 
-    inline bool shouldClose() noexcept
-    {
-      if(!_window)
-        return true;
-
-      return glfwWindowShouldClose(_window);
-    }
+    bool shouldClose() noexcept;
 
     void processingLoopStart() noexcept;
 
     void processingLoopEnd() noexcept;
 
-  protected:
+  private:
 
-    static void ErrorCallback(int error, const char* description);
-
-    static void FrameBufferSizeCallback(GLFWwindow*, int w, int h);
-
-    void ProcessInput() noexcept;
-
-    GLFWwindow* _window = nullptr;
+    class Private;
+    std::unique_ptr<Private> _private;
 };

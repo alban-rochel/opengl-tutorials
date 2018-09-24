@@ -1,3 +1,8 @@
+learn/ShaderWrapper.cpp
+learn/ShaderWrapper.h
+learn/fragment.fs
+learn/generated.h.in
+learn/vertex.vs
 learn/GlfwWrapper.cpp
 learn/GlfwWrapper.h
 learn/learn_common.h

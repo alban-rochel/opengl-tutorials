@@ -1,8 +1,36 @@
 #include "GlfwWrapper.h"
+#include <cassert>
 
-GlfwWrapper::GlfwWrapper() noexcept
+class GlfwWrapper::Private
 {
-  glfwSetErrorCallback(ErrorCallback);
+  public:
+    static void ErrorCallback(int error, const char* description)
+    {
+      std::cerr << "Error " << error << ": " << description << "\n";
+    }
+
+    static void FrameBufferSizeCallback(GLFWwindow*, int w, int h)
+    {
+      glViewport(0, 0, w, h);
+    }
+
+    void ProcessInput() noexcept
+    {
+      assert(_window);
+
+      if(glfwGetKey(_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+      {
+        glfwSetWindowShouldClose(_window, true);
+      }
+    }
+
+    GLFWwindow* _window = nullptr;
+};
+
+GlfwWrapper::GlfwWrapper() noexcept:
+  _private(new Private)
+{
+  glfwSetErrorCallback(Private::ErrorCallback);
 }
 
 GlfwWrapper::~GlfwWrapper() noexcept
@@ -12,61 +40,50 @@ GlfwWrapper::~GlfwWrapper() noexcept
 
 bool GlfwWrapper::init() noexcept
 {
-  if(_window)
-    return false;
+  assert(_private);
+  assert(!_private->_window);
 
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  _window = glfwCreateWindow(800, 600, "Pwet", nullptr, nullptr);
+  _private->_window = glfwCreateWindow(800, 600, "Pwet", nullptr, nullptr);
 
-  if(!_window)
+  if(!_private->_window)
   {
     return false;
   }
 
-  glfwMakeContextCurrent(_window);
+  glfwMakeContextCurrent(_private->_window);
 
   glViewport(0, 0, 800, 600);
 
-  glfwSetFramebufferSizeCallback(_window, FrameBufferSizeCallback);
+  glfwSetFramebufferSizeCallback(_private->_window, Private::FrameBufferSizeCallback);
 
   return true;
 }
 
 void GlfwWrapper::processingLoopStart() noexcept
 {
-  ProcessInput();
+  assert(_private);
+
+  _private->ProcessInput();
 }
 
 void GlfwWrapper::processingLoopEnd() noexcept
 {
-  if(!_window)
-    return;
+  assert(_private);
+  assert(_private->_window);
 
-  glfwSwapBuffers(_window);
+  glfwSwapBuffers(_private->_window);
   glfwPollEvents();
 }
 
-void GlfwWrapper::ErrorCallback(int error, const char* description)
+bool GlfwWrapper::shouldClose() noexcept
 {
-  std::cerr << "Error " << error << ": " << description << "\n";
-}
+  assert(_private);
+  assert(_private->_window);
 
-void GlfwWrapper::FrameBufferSizeCallback(GLFWwindow*, int w, int h)
-{
-  glViewport(0, 0, w, h);
-}
-
-void GlfwWrapper::ProcessInput() noexcept
-{
-  if(!_window)
-    return;
-
-  if(glfwGetKey(_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-  {
-    glfwSetWindowShouldClose(_window, true);
-  }
+  return glfwWindowShouldClose(_private->_window);
 }
