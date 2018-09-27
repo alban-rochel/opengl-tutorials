@@ -16,7 +16,8 @@ class ShaderWrapper
 
     bool use() noexcept;
 
-    GLuint program() noexcept;
+    void setUniformFloat(const GLchar* uniformName,
+                         float value) noexcept;
 
   private:
     class Private;

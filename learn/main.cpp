@@ -1,6 +1,7 @@
 #include "GlfwWrapper.h"
 #include "ShaderWrapper.h"
 #include "generated.h"
+#include "stb_image.h"
 
 int main(int, char**)
 {
@@ -56,6 +57,13 @@ int main(int, char**)
     1, 2, 3   // second triangle
   };
 
+  float texture_coords[] = {
+    1.0f, 1.0f,  // top-right corner
+    1.0f, 0.0f,  // bottom-right corner
+    0.0f, 0.0f,  // bottom-left corner
+    0.0f, 1.0f,  // top-left corner
+  };
+
   // Send to VertexBufferObject
   GLuint vbo;
   {
@@ -66,6 +74,13 @@ int main(int, char**)
   {
     glGenBuffers(1, &colour_vbo); // create a buffer
   }
+
+  GLuint texture, textureCoordVbo;
+  {
+    glGenTextures(1, &texture);
+    glGenBuffers(1, &textureCoordVbo);
+  }
+
 
   // Element buffer object
   GLuint ebo;
@@ -123,6 +138,56 @@ int main(int, char**)
       glEnableVertexAttribArray(1 /* enable attribute at location 1 */);
     }
 
+    // Bind texture
+    {
+      int width, height, nrChannels;
+      unsigned char *data = stbi_load(TEXTURE_FILE, &width, &height, &nrChannels, 0);
+
+      if(data)
+      {
+        glBindTexture(GL_TEXTURE_2D, texture);
+
+        // set the texture wrapping/filtering options (on the currently bound texture object)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        glTexImage2D(GL_TEXTURE_2D,
+                     0 /*mipmap level*/,
+                     GL_RGB /*stored format*/,
+                     width, height,
+                     0 /*legacy*/,
+                     GL_RGB /*in format*/,
+                     GL_UNSIGNED_BYTE /*in format*/,
+                     data);
+        glGenerateMipmap(GL_TEXTURE_2D); // autogenerate
+
+        glBindBuffer(GL_ARRAY_BUFFER, textureCoordVbo); // attach vbo as an array buffer
+
+        // From this point on, functions apply to the current GL_ARRAY_BUFFER, i.e. vbo
+
+        glBufferData(GL_ARRAY_BUFFER,
+                     sizeof(texture_coords),
+                     texture_coords,
+                     GL_STATIC_DRAW); // memcpy to current buffer
+
+        glVertexAttribPointer(2,
+                              2 /* vec2 */,
+                              GL_FLOAT /* vec2 */,
+                              GL_FALSE /* do not normalize */,
+                              2 * sizeof(float) /* vec2, tightly packed*/,
+                              nullptr /* start offset */);
+        glEnableVertexAttribArray(2);
+      }
+      else
+      {
+        std::cerr << "Failed loading texture\n";
+      }
+
+      stbi_image_free(data);
+    }
+
     // Set up EBO
     {
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -131,6 +196,7 @@ int main(int, char**)
                    indices,
                    GL_STATIC_DRAW);
     }
+
   }
 
   while(!wrapper.shouldClose())
@@ -139,10 +205,9 @@ int main(int, char**)
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    int vertexColorLocation = glGetUniformLocation(shaders.program(), "time");
-    glUniform1f(vertexColorLocation, glfwGetTime());
-
+    shaders.setUniformFloat("time", glfwGetTime());
     shaders.use();
+    glBindTexture(GL_TEXTURE_2D, texture);
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES,
                    6 /* number of vertices */,

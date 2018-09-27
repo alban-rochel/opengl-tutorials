@@ -170,10 +170,12 @@ bool ShaderWrapper::use() noexcept
   return true;
 }
 
-GLuint ShaderWrapper::program() noexcept
+void ShaderWrapper::setUniformFloat(const GLchar* uniformName,
+                                    float value) noexcept
 {
   assert(_private);
   assert(_private->_program);
 
-  return _private->_program;
+  int location = glGetUniformLocation(_private->_program, uniformName);
+  glUniform1f(location, value);
 }
