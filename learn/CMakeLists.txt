@@ -13,6 +13,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/generated.h.in ${CMAKE_CURRENT_BINARY
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/vertex.vs ${CMAKE_CURRENT_BINARY_DIR}/vertex.vs COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/fragment.fs ${CMAKE_CURRENT_BINARY_DIR}/fragment.fs COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png COPYONLY)
 
 target_link_libraries(${LEARN}
   ${GLEW_LIBRARIES}

@@ -179,3 +179,13 @@ void ShaderWrapper::setUniformFloat(const GLchar* uniformName,
   int location = glGetUniformLocation(_private->_program, uniformName);
   glUniform1f(location, value);
 }
+
+void ShaderWrapper::setUniformInt(const GLchar* uniformName,
+                                    GLuint value) noexcept
+{
+  assert(_private);
+  assert(_private->_program);
+
+  int location = glGetUniformLocation(_private->_program, uniformName);
+  glUniform1i(location, value);
+}

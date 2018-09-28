@@ -57,11 +57,18 @@ int main(int, char**)
     1, 2, 3   // second triangle
   };
 
-  float texture_coords[] = {
+  float texture_coords_0[] = {
     1.0f, 1.0f,  // top-right corner
     1.0f, 0.0f,  // bottom-right corner
     0.0f, 0.0f,  // bottom-left corner
     0.0f, 1.0f,  // top-left corner
+  };
+
+  float texture_coords_1[] = {
+     1.2f,  1.2f,  // top-right corner
+     1.2f, -0.2f,  // bottom-right corner
+    -0.2f, -0.2f,  // bottom-left corner
+    -0.2f,  1.2f,  // top-left corner
   };
 
   // Send to VertexBufferObject
@@ -75,10 +82,16 @@ int main(int, char**)
     glGenBuffers(1, &colour_vbo); // create a buffer
   }
 
-  GLuint texture, textureCoordVbo;
+  GLuint texture0, textureCoordVbo0;
   {
-    glGenTextures(1, &texture);
-    glGenBuffers(1, &textureCoordVbo);
+    glGenTextures(1, &texture0);
+    glGenBuffers(1, &textureCoordVbo0);
+  }
+
+  GLuint texture1, textureCoordVbo1;
+  {
+    glGenTextures(1, &texture1);
+    glGenBuffers(1, &textureCoordVbo1);
   }
 
 
@@ -138,14 +151,15 @@ int main(int, char**)
       glEnableVertexAttribArray(1 /* enable attribute at location 1 */);
     }
 
-    // Bind texture
+    // Bind texture 0
     {
       int width, height, nrChannels;
-      unsigned char *data = stbi_load(TEXTURE_FILE, &width, &height, &nrChannels, 0);
+      unsigned char *data = stbi_load(TEXTURE_FILE_0, &width, &height, &nrChannels, 0);
 
       if(data)
       {
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture0);
 
         // set the texture wrapping/filtering options (on the currently bound texture object)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -163,13 +177,13 @@ int main(int, char**)
                      data);
         glGenerateMipmap(GL_TEXTURE_2D); // autogenerate
 
-        glBindBuffer(GL_ARRAY_BUFFER, textureCoordVbo); // attach vbo as an array buffer
+        glBindBuffer(GL_ARRAY_BUFFER, textureCoordVbo0); // attach vbo as an array buffer
 
         // From this point on, functions apply to the current GL_ARRAY_BUFFER, i.e. vbo
 
         glBufferData(GL_ARRAY_BUFFER,
-                     sizeof(texture_coords),
-                     texture_coords,
+                     sizeof(texture_coords_0),
+                     texture_coords_0,
                      GL_STATIC_DRAW); // memcpy to current buffer
 
         glVertexAttribPointer(2,
@@ -182,7 +196,58 @@ int main(int, char**)
       }
       else
       {
-        std::cerr << "Failed loading texture\n";
+        std::cerr << "Failed loading texture 0\n";
+      }
+
+      stbi_image_free(data);
+    }
+
+    // Bind texture 1
+    {
+      int width, height, nrChannels;
+      unsigned char *data = stbi_load(TEXTURE_FILE_1, &width, &height, &nrChannels, 0);
+
+      if(data)
+      {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+
+        // set the texture wrapping/filtering options (on the currently bound texture object)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        glTexImage2D(GL_TEXTURE_2D,
+                     0 /*mipmap level*/,
+                     GL_RGB /*stored format*/,
+                     width, height,
+                     0 /*legacy*/,
+                     GL_RGBA /*in format*/,
+                     GL_UNSIGNED_BYTE /*in format*/,
+                     data);
+        glGenerateMipmap(GL_TEXTURE_2D); // autogenerate
+
+        glBindBuffer(GL_ARRAY_BUFFER, textureCoordVbo1); // attach vbo as an array buffer
+
+        // From this point on, functions apply to the current GL_ARRAY_BUFFER, i.e. vbo
+
+        glBufferData(GL_ARRAY_BUFFER,
+                     sizeof(texture_coords_1),
+                     texture_coords_1,
+                     GL_STATIC_DRAW); // memcpy to current buffer
+
+        glVertexAttribPointer(3,
+                              2 /* vec2 */,
+                              GL_FLOAT /* vec2 */,
+                              GL_FALSE /* do not normalize */,
+                              2 * sizeof(float) /* vec2, tightly packed*/,
+                              nullptr /* start offset */);
+        glEnableVertexAttribArray(3);
+      }
+      else
+      {
+        std::cerr << "Failed loading texture 1\n";
       }
 
       stbi_image_free(data);
@@ -199,15 +264,23 @@ int main(int, char**)
 
   }
 
+  shaders.use();
+  shaders.setUniformInt("ourTexture1", 0);
+  shaders.setUniformInt("ourTexture2", 1);
+
   while(!wrapper.shouldClose())
   {
     wrapper.processingLoopStart();
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    shaders.setUniformFloat("time", glfwGetTime());
     shaders.use();
-    glBindTexture(GL_TEXTURE_2D, texture);
+    shaders.setUniformFloat("time", glfwGetTime());
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture0);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES,
                    6 /* number of vertices */,

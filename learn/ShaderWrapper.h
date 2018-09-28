@@ -19,6 +19,9 @@ class ShaderWrapper
     void setUniformFloat(const GLchar* uniformName,
                          float value) noexcept;
 
+    void setUniformInt(const GLchar* uniformName,
+                       GLuint value) noexcept;
+
   private:
     class Private;
     std::unique_ptr<Private>_private;
