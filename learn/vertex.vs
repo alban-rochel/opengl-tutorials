@@ -6,6 +6,9 @@ layout (location = 2) in vec2 aTex1; // aTex1 is attribute 2
 layout (location = 3) in vec2 aTex2; // aTex2 is attribute 3
 
 uniform float time;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 
 out vec3 colour;
 out vec2 texCoord1;
@@ -17,7 +20,10 @@ void main()
   texCoord1 = aTex1;
   texCoord2 = vec2( (aTex2.x-0.5) * cos(time*2) + (aTex2.y-0.5) * sin(time*2),
                     (aTex2.x-0.5) * sin(time*2) - (aTex2.y-0.5) * cos(time*2));
-  gl_Position = vec4( aPos.x + cos(time)/10.,
+  gl_Position = projection *
+                view *
+                model *
+                vec4( aPos.x + cos(time)/10.,
                       aPos.y + sin(time)/10.,
                       aPos.z
                       , 1.0);

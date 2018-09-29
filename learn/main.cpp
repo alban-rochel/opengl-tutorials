@@ -264,9 +264,21 @@ int main(int, char**)
 
   }
 
+  glm::mat4 model = glm::rotate(glm::identity<glm::mat4>(),
+                                glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+  glm::mat4 view = glm::translate(glm::identity<glm::mat4>(),
+                                  glm::vec3(0.0f, 0.0f, -3.0f));
+  glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+                                          800.f / 600.f,
+                                          0.1f,
+                                          100.0f);
+
   shaders.use();
   shaders.setUniformInt("ourTexture1", 0);
   shaders.setUniformInt("ourTexture2", 1);
+  shaders.setUniformMat4("model", model);
+  shaders.setUniformMat4("view", view);
+  shaders.setUniformMat4("projection", projection);
 
   while(!wrapper.shouldClose())
   {

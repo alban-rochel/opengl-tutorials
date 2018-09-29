@@ -189,3 +189,17 @@ void ShaderWrapper::setUniformInt(const GLchar* uniformName,
   int location = glGetUniformLocation(_private->_program, uniformName);
   glUniform1i(location, value);
 }
+
+void ShaderWrapper::setUniformMat4(const GLchar* uniformName,
+                                   const glm::mat4& value) noexcept
+{
+  assert(_private);
+  assert(_private->_program);
+
+  int location = glGetUniformLocation(_private->_program, uniformName);
+
+  glUniformMatrix4fv(location,
+                     1 /* matrix count */,
+                     GL_FALSE /* do not swap colums/rows*/,
+                     glm::value_ptr(value) /* OpenGL-compliant */);
+}
