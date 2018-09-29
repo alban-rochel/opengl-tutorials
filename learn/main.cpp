@@ -38,13 +38,21 @@ int main(int, char**)
   // define vertices
   float vertices[] =
   {
-     0.5f,  0.5f,  0.0f, // top right
-     0.5f, -0.5f,  0.0f, // bottom right
-    -0.5f, -0.5f,  0.0f, // bottom left
-    -0.5f,  0.5f,  0.0f, // top left
+     0.5f,  0.5f,  0.5f, // front: top right
+     0.5f, -0.5f,  0.5f, // front: bottom right
+    -0.5f, -0.5f,  0.5f, // front: bottom left
+    -0.5f,  0.5f,  0.5f, // front: top left
+     0.5f,  0.5f, -0.5f, // back: top right
+     0.5f, -0.5f, -0.5f, // back: bottom right
+    -0.5f, -0.5f, -0.5f, // back: bottom left
+    -0.5f,  0.5f, -0.5f, // back: top left
   }; // Normalized Device Coordinates (NDC)
 
   float colours[] {
+    1.0f, 0.0f, 0.0f, // red
+    0.0f, 1.0f, 0.0f, // green
+    0.0f, 0.0f, 1.0f, // blue
+    1.0f, 1.0f, 0.0f, // yellow
     1.0f, 0.0f, 0.0f, // red
     0.0f, 1.0f, 0.0f, // green
     0.0f, 0.0f, 1.0f, // blue
@@ -54,20 +62,51 @@ int main(int, char**)
   unsigned int indices[] =
   {
     0, 1, 3,  // first triangle
-    1, 2, 3   // second triangle
+    1, 2, 3,   // second triangle
+    4, 5, 0,
+    5, 1, 0,
+    7, 6, 4,
+    6, 5, 4,
+    3, 2, 7,
+    2, 6, 7,
+    4, 3, 7,
+    4, 0, 3,
+    1, 2, 6,
+    1, 6, 5
   };
 
-  float texture_coords_0[] = {
+  /*float texture_coords_0[] = {
     1.0f, 1.0f,  // top-right corner
     1.0f, 0.0f,  // bottom-right corner
     0.0f, 0.0f,  // bottom-left corner
     0.0f, 1.0f,  // top-left corner
+
+  };*/
+  float texture_coords_0[] = {
+    0.5f, 0.5f,  // top-right corner
+    0.5f, 0.0f,  // bottom-right corner
+    0.0f, 0.0f,  // bottom-left corner
+    0.0f, 0.5f,  // top-left corner
+    1.0f, 1.0f,  // top-right corner
+    1.0f, 0.0f,  // bottom-right corner
+    0.5f, 0.5f,  // bottom-left corner
+    0.0f, 1.0f,  // top-left corner
   };
 
-  float texture_coords_1[] = {
+  /*float texture_coords_1[] = {
      1.2f,  1.2f,  // top-right corner
      1.2f, -0.2f,  // bottom-right corner
     -0.2f, -0.2f,  // bottom-left corner
+    -0.2f,  1.2f,  // top-left corner
+  };*/
+  float texture_coords_1[] = {
+     0.5f,  0.5f,  // top-right corner
+     0.5f, -0.2f,  // bottom-right corner
+    -0.2f, -0.2f,  // bottom-left corner
+    -0.2f,  0.5f,  // top-left corner
+     1.2f,  1.2f,  // top-right corner
+     1.2f, -0.2f,  // bottom-right corner
+     0.5f,  0.5f,  // bottom-left corner
     -0.2f,  1.2f,  // top-left corner
   };
 
@@ -264,8 +303,6 @@ int main(int, char**)
 
   }
 
-  glm::mat4 model = glm::rotate(glm::identity<glm::mat4>(),
-                                glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
   glm::mat4 view = glm::translate(glm::identity<glm::mat4>(),
                                   glm::vec3(0.0f, 0.0f, -3.0f));
   glm::mat4 projection = glm::perspective(glm::radians(45.0f),
@@ -276,7 +313,6 @@ int main(int, char**)
   shaders.use();
   shaders.setUniformInt("ourTexture1", 0);
   shaders.setUniformInt("ourTexture2", 1);
-  shaders.setUniformMat4("model", model);
   shaders.setUniformMat4("view", view);
   shaders.setUniformMat4("projection", projection);
 
@@ -286,8 +322,12 @@ int main(int, char**)
 
     glClear(GL_COLOR_BUFFER_BIT);
 
+    glm::mat4 model = glm::rotate(glm::identity<glm::mat4>(),
+                                  (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(0.5f, 0.5f, 0.0f));
+
     shaders.use();
     shaders.setUniformFloat("time", glfwGetTime());
+    shaders.setUniformMat4("model", model);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture0);
@@ -295,7 +335,7 @@ int main(int, char**)
     glBindTexture(GL_TEXTURE_2D, texture1);
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES,
-                   6 /* number of vertices */,
+                   36 /* number of vertices */,
                    GL_UNSIGNED_INT /* type of indices */,
                    0 /* null offset */);
 
